@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visibly Invisible Search</title>
+  <!-- Includes the wpapi module -->
+  <script src="wpapi/wpapi.min.js"></script>
+  <!-- Bootstrap CSS and Javascript -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+  <style>
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <form action="" method="get" class="form">
+      I am a
+      <!-- Dropdown for role -->
+      <select name="role" id="role">
+        <option value="default">select role</option>
+        <option value="parent">parent of</option>
+        <option value="family">family of</option>
+        <option value="ally">ally of</option>
+        <option value="transgender">transgender</option>
+      </select>
+      and want help with
+      <!-- Dropdown for topic -->
+      <select name="categories" id="categories"></select>
+
+      and want help with
+      <!-- Dropdown for topic -->
+      <select name="tags" id="tags"></select>
+
+      <button class="btn btn-primary" type="submit" id="submit">
+        See my resources
+      </button>
+    </form>
+
+    <table id="results" class="hidden table">
+      <thead>
+        <tr>
+          <th>Title</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+
+    <!-- Error Messages Here -->
+    <div id="error" class="hidden">
+      <p>Sorry, we couldn't find any resources for you. Please try again.</p>
+  </div>
+</body>
+<script>
+
+  // Using WPAPI, we can get the categories and tags from the WordPress site
+  const wp = new WPAPI({ endpoint: 'https://rlewiskrisky.wpcomstaging.com/wp-json' });
+
+  // get the categories, and then assign to the dropdown
+  wp.categories().perPage(100).then(function(data){
+    console.log(data)
+    let categories = document.getElementById('categories');
+    for (let i = 0; i < data.length; i++) {
+      let option = document.createElement('option');
+      option.value = data[i].id;
+      option.innerHTML = data[i].name;
+      categories.appendChild(option);
+    }
+  });
+
+  wp.tags().perPage(100).then(function(data){
+    console.log(data)
+    let tags = document.getElementById('tags');
+    for (let i = 0; i < data.length; i++) {
+      let option = document.createElement('option');
+      option.value = data[i].id;
+      option.innerHTML = data[i].name;
+      tags.appendChild(option);
+    }
+  });
+
+  // When we press the submit button, get the categories and tags and search.
+  document.getElementById('submit').addEventListener('click', function(e){
+    // Show the table
+    document.getElementById('results').classList.remove('hidden');
+
+    // Hide the error message
+    document.getElementById('error').classList.add('hidden');
+
+    // Prevent the form from submitting
+    e.preventDefault();
+    let role = document.getElementById('role').value;
+    let category = document.getElementById('categories').value;
+    let tag = document.getElementById('tags').value;
+    console.log(role, category, tag);
+    wp.posts().perPage(100).categories(category).tags(tag).embed()
+      .then(function(data){
+        // If data.length is 0, then we need to show a message
+        if(data.length === 0) {
+          // Hide the table
+          document.getElementById('results').classList.add('hidden');
+          document.getElementById('error').classList.remove('hidden');
+        }
+
+        console.log(data)
+        // Append the data to the table results
+        let results = document.getElementById('results');
+        let tbody = results.getElementsByTagName('tbody')[0];
+        tbody.innerHTML = '';
+        for (let i = 0; i < data.length; i++) {
+          let tr = document.createElement('tr');
+          let title = document.createElement('td');
+          let link = document.createElement('a');
+          title.innerHTML = `<a href="${data[i].link}">${data[i].title.rendered}</a>`;
+          tr.appendChild(title);
+          tbody.appendChild(tr);
+        }
+      });
+  });
+
+</script>
+</html>
