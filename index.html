@@ -112,7 +112,7 @@
     let category = document.getElementById('categories').value;
     let tag = document.getElementById('tags').value;
     console.log(role, category, tag);
-    wp.posts().perPage(100).categories(category).tags(tag).embed()
+    wp.posts().perPage(100).tags(category).tags(tag).embed()
       .then(function (data) {
         // If data.length is 0, then we need to show a message
         if (data.length === 0) {
