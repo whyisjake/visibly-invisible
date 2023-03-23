@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,19 +9,26 @@
   <!-- Includes the wpapi module -->
   <script src="wpapi/wpapi.min.js"></script>
   <!-- Bootstrap CSS and Javascript -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+    integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+    integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+    crossorigin="anonymous"></script>
   <style>
     .hidden {
       display: none;
     }
+
   </style>
 </head>
+
 <body>
   <div class="container">
     <form action="" method="get" class="form">
-      I am a
+      I am
       <!-- Dropdown for role -->
       <select name="role" id="role">
         <option value="default">select role</option>
@@ -29,13 +37,18 @@
         <option value="ally">ally of</option>
         <option value="transgender">transgender</option>
       </select>
-      and want help with
+      <br>
+      and I'm looking for
       <!-- Dropdown for topic -->
-      <select name="categories" id="categories"></select>
+      <select name="categories" id="categories">
+        <option value="">Select Tag</option>
+      </select>
 
-      and want help with
+      and
       <!-- Dropdown for topic -->
-      <select name="tags" id="tags"></select>
+      <select name="tags" id="tags">
+        <option value="">Select Tag</option>
+      </select>
 
       <button class="btn btn-primary" type="submit" id="submit">
         See my resources
@@ -55,7 +68,7 @@
     <!-- Error Messages Here -->
     <div id="error" class="hidden">
       <p>Sorry, we couldn't find any resources for you. Please try again.</p>
-  </div>
+    </div>
 </body>
 <script>
 
@@ -63,7 +76,7 @@
   const wp = new WPAPI({ endpoint: 'https://rlewiskrisky.wpcomstaging.com/wp-json' });
 
   // get the categories, and then assign to the dropdown
-  wp.categories().perPage(100).then(function(data){
+  wp.tags().perPage(100).then(function (data) {
     console.log(data)
     let categories = document.getElementById('categories');
     for (let i = 0; i < data.length; i++) {
@@ -74,7 +87,7 @@
     }
   });
 
-  wp.tags().perPage(100).then(function(data){
+  wp.tags().perPage(100).then(function (data) {
     console.log(data)
     let tags = document.getElementById('tags');
     for (let i = 0; i < data.length; i++) {
@@ -86,7 +99,7 @@
   });
 
   // When we press the submit button, get the categories and tags and search.
-  document.getElementById('submit').addEventListener('click', function(e){
+  document.getElementById('submit').addEventListener('click', function (e) {
     // Show the table
     document.getElementById('results').classList.remove('hidden');
 
@@ -100,9 +113,9 @@
     let tag = document.getElementById('tags').value;
     console.log(role, category, tag);
     wp.posts().perPage(100).categories(category).tags(tag).embed()
-      .then(function(data){
+      .then(function (data) {
         // If data.length is 0, then we need to show a message
-        if(data.length === 0) {
+        if (data.length === 0) {
           // Hide the table
           document.getElementById('results').classList.add('hidden');
           document.getElementById('error').classList.remove('hidden');
@@ -125,4 +138,5 @@
   });
 
 </script>
+
 </html>
